@@ -8,41 +8,53 @@ using namespace std;
 #define population 5 //粒子數
 
 #define w 0.5  //慣性權重
-#define c1 1   //Pbest權重
+#define c1 1.0 //Pbest權重
 #define c2 1.2 //Gbest權重
 
-float particle[population][dim];
-float particleV[population][dim] = {0};
-float fitness[population] = {0};
-float gbest, gbest_p[dim];
-float pbest[population] = {0}, pbest_p[population][dim];
+struct particle
+{
+    float position[dim];       //位置
+    float fitness;             //適應值
+    float v[dim] = {0};        //速度
+    float pbest_position[dim]; //自己曾經最好的位置
+    float pbest_fitness;       //自己曾經最好的適應值
+};
+
+particle pop[population]; //粒子們
+particle gbest;
 void initial();
 void fit();
 void move();
+float fitness_f(float num)
+{
+    return fabs(num);
+}
+
 int main()
 {
     initial();
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < 350; i++)
     {
         cout << "====iteration" << i + 2 << "=====" << endl;
         fit();
         move();
     }
+    return 0;
 }
 void initial()
 {
-    int length = upper - lower;
+    double length = upper - lower;
     for (int i = 0; i < population; i++)
     {
         for (int j = 0; j < dim; j++)
         {
-            particle[i][j] = ((float)rand() / RAND_MAX) * length + lower;
-            cout << particle[i][j] << ",";
+            pop[i].position[j] = ((float)rand() / RAND_MAX) * length + lower;
+            cout << pop[i].position[j] << ",";
         }
-        pbest[i] = 10000;
+        pop[i].pbest_fitness = 10000;
         cout << endl;
     }
-    gbest = 10000;
+    gbest.fitness = 10000;
 }
 void fit()
 {
@@ -50,29 +62,29 @@ void fit()
 
     for (int i = 0; i < population; i++)
     {
-        fitness[i] = 0;
+        pop[i].fitness = 0;
         for (int j = 0; j < dim; j++)
         {
-            fitness[i] += fabs(particle[i][j]);
+            pop[i].fitness += fitness_f(pop[i].position[j]);
         }
-        cout << fitness[i] << endl;
-        if (fitness[i] < pbest[i])
+        cout << pop[i].fitness << endl;
+        if (pop[i].fitness < pop[i].pbest_fitness)
         {
-            pbest[i] = fitness[i];
+            pop[i].pbest_fitness = pop[i].fitness;
             for (int j = 0; j < dim; j++)
             {
-                pbest_p[i][j] = particle[i][j];
+                pop[i].pbest_position[j] = pop[i].position[j];
             }
             cout << "===pbest===" << i << ":";
-            cout << fitness[i] << endl;
+            cout << pop[i].pbest_fitness << endl;
         }
-        if (pbest[i] < gbest)
+        if (pop[i].pbest_fitness < gbest.fitness)
         {
-            gbest = pbest[i];
-            cout << "===gbest===" << gbest << endl;
+            gbest.fitness = pop[i].pbest_fitness;
+            cout << "===gbest===" << gbest.fitness << endl;
             for (int j = 0; j < dim; j++)
             {
-                gbest_p[j] = pbest_p[i][j];
+                gbest.position[j] = pop[i].pbest_position[j];
             }
         }
     }
@@ -85,13 +97,13 @@ void move()
         cout << "pop: " << i << ": ";
         for (int j = 0; j < dim; j++)
         {
-            r1 = rand() / RAND_MAX;
-            r2 = rand() / RAND_MAX;
+            //r1 = rand() / RAND_MAX;
+            //r2 = rand() / RAND_MAX;
 
-            particleV[i][j] = w * particleV[i][j] + c1 * (pbest_p[i][j] - particle[i][j]) + c2 * (gbest_p[j] - particle[i][j]);
-            cout << particleV[i][j] << "; ";
-            particle[i][j] = particle[i][j] + particleV[i][j];
-            cout << particle[i][j] << ",";
+            pop[i].v[j] = w * pop[i].v[j] + c1 * (pop[i].pbest_position[j] - pop[i].position[j]) + c2 * (gbest.position[j] - pop[i].position[j]);
+            cout << pop[i].v[j] << "; ";
+            pop[i].position[j] = pop[i].position[j] + pop[i].v[j];
+            cout << pop[i].position[j] << "; ";
         }
         cout << endl;
     }

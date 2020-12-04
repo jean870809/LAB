@@ -2,5 +2,8 @@
     "cSpell.words": [
         "gbest",
         "pbest"
-    ]
+    ],
+    "files.associations": {
+        "iostream": "cpp"
+    }
 }
