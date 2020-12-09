@@ -22,12 +22,13 @@ void move();
 int main()
 {
     initial();
-    for (int i = 0; i < 350; i++)
+    for (int i = 0; i < 20; i++)
     {
         cout << "====iteration" << i + 2 << "=====" << endl;
         fit();
         move();
     }
+    return 0;
 }
 void initial()
 {
