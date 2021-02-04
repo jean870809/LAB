@@ -119,6 +119,7 @@ int main()
     //output_print(output2, 20);
     output_bellstate(output2, 45);
     //csv_output_bellstate(output2);
+    system("pause");
     return 0;
 }
 void expand(string s, int n)
